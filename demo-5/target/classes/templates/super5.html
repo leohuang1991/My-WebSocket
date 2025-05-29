@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<title>Insert title here</title>
+</head>
+<body>
+<p id="p1"></p>
+<br>
+<button id="btn1">connect</button>
+
+<br>
+<button id="btn2">upload</button>
+<script type="text/javascript">
+var data=document.getElementById("p1");
+var btn1=document.getElementById("btn1");
+var btn2=document.getElementById("btn2");
+var ws="/ws";
+var pp="";
+var socket =null;
+var stompClient =null;
+var jsondata={
+		content:"maxroll",
+		time: "name",
+		};
+		
+let jsondata2=JSON.stringify(jsondata);
+
+btn1.onclick =function() {
+	
+	socket =new SockJS(ws);
+	stompClient =Stomp.over(socket);
+	stompClient.connect({}, function (frame) {
+		
+			stompClient.subscribe("/message/con3", function (response) {
+			console.log("success Max");
+			//console.log(response);
+		     //
+		     var ma=JSON.parse(response.body);
+		     data.innerHTML+=ma.content+" "+ma.time+"<br>";
+		},{});
+		//},500);
+	},function (){
+		data.innerHTML="error";
+	});
+	
+};
+btn2.onclick =function() {
+	if(stompClient){
+		stompClient.send("/app/gyc2",{},jsondata2);
+		
+	}
+};
+</script>
+</body>
+</html>

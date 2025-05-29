@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+<meta charset="UTF-8">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<title>Insert title here</title>
+
+</head>
+<body>
+websocket2
+<p id="p1"></p><br>
+<button id="btn1">upload</button><br>
+<button id="btn2">/ws</button>
+<button id="btn3">/gy</button><br>
+<button id="btn4">disconnect</button><br>
+<p id="p2">topic</p>
+<p id="p3">gyc</p>
+<script type="text/javascript">
+var data=document.getElementById("p1");//'/topic'
+var p2=document.getElementById("p2");
+var p3=document.getElementById("p3");
+var btn1=document.getElementById("btn1");
+var btn2=document.getElementById("btn2");
+var btn3=document.getElementById("btn3");
+var btn4=document.getElementById("btn4");
+var ws="/ws";
+var pp="";
+var socket =null;
+var stompClient =null;
+var jsondata={
+		content:"maxroll",
+		name: "name",
+		};
+		
+let jsondata2=JSON.stringify(jsondata);
+btn2.onclick =function() {
+	data.innerHTML=btn2.innerHTML;
+	ws=btn2.innerHTML;
+	socket =new SockJS(ws);
+	stompClient =Stomp.over(socket);
+	stompClient.connect({}, function (frame) {
+		//data.innerHTML="success";
+		//stompClient.send("/app/message1",{},jsondata2);
+		//setTimeout(function() {
+			stompClient.subscribe("/"+p2.innerHTML+"/content", function (response) {
+			console.log("success Max");
+			//console.log(response);
+		     //
+		     var ma=JSON.parse(response.body);
+		     data.innerHTML+=ma.content+" "+ma.name;
+		},{});
+		//},500);
+	},function (){
+		data.innerHTML="error";
+	});
+	pp=p2.innerHTML;
+};
+
+btn3.onclick =function() {
+	data.innerHTML=btn3.innerHTML;
+	ws=btn2.innerHTML;
+	socket =new SockJS(ws);
+	stompClient =Stomp.over(socket);
+	stompClient.connect({}, function (frame) {
+		//data.innerHTML="success";
+		//stompClient.send("/app/message1",{},jsondata2);
+		//setTimeout(function() {
+			stompClient.subscribe("/"+p3.innerHTML+"/content", function (response) {
+			console.log("success Max");
+			//console.log(response);
+		     //
+		     var ma=JSON.parse(response.body);
+		     data.innerHTML+=ma.content+" "+ma.name;
+		},{});
+		//},500);
+	},function (){
+		data.innerHTML="error";
+	});
+	
+	pp=p3.innerHTML;
+};
+
+btn4.onclick =function() {
+	if(stompClient){
+		stompClient.disconnect();
+		data.innerHTML=btn4.innerHTML;
+	}
+}
+
+btn1.onclick =function() {
+	if(stompClient){
+	stompClient.send("/app/"+pp,{},jsondata2);
+	
+}
+	//data.innerHTML="hello";
+};
+//stompClient.disconnect();
+//if(stompClient){
+//	stompClient.send("/app/message1",{},jsondata2);
+//}
+//data.innerHTML="hello";
+//stompClient.send("/app/message1",{},jsondata2);
+</script>
+</body>
+</html>

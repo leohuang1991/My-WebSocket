@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<title>Insert title here</title>
+</head>
+<body>
+Websocket3
+
+<p id="p1"></p><br>
+
+<p id="p5"></p><br>
+
+<p id="p2">linda</p> <button id="btn1">sessionlinda</button>
+<button id="btn3">connect</button><br>
+<p id="p3">tomy</p><button id="btn2">sessiontomy</button>
+<button id="btn4">diconnect</button><br>
+<button id="btn5">upload</button>
+<script type="text/javascript">
+var p1=document.getElementById("p1");
+var p2=document.getElementById("p2");
+var p3=document.getElementById("p3");
+var btn1=document.getElementById("btn1");
+var btn2=document.getElementById("btn2");
+var btn3=document.getElementById("btn3");
+var btn4=document.getElementById("btn4");
+var btn5=document.getElementById("btn5");
+var ws="/greeting";
+var socket =null;
+var stompClient =null;
+var jsondata={
+		content:"maxroll",
+		name: "name",
+		};
+var jsondata2=JSON.stringify(jsondata);
+var urlString2="../dlisten";
+var data00={
+		sessionname : p2.innerHTML,
+};
+var jsonData0 = JSON.stringify(data00);
+var data01={
+		sessionname : p3.innerHTML,
+};
+var jsonData1 = JSON.stringify(data01);
+var array1=[{
+	content:"hello",
+	name: "nick",
+	}];
+btn1.onclick =function() {
+	$.ajax(
+	        {
+	            url:urlString2,
+	            type:'POST', //不給 預設為GET
+	            beforeSend:function(xhr){
+	                //帶Request Header Content-Type
+	                xhr.setRequestHeader('Content-Type','application/json');
+	            },
+	            //傳遞JSON String
+	            data:jsonData0,
+	            //成功回呼 Http status 2xx
+	            success:function(data,status,xhr){
+	               // console.log(data.content);//
+	              document.getElementById("p5").innerHTML=data.content;
+	                
+	            },
+	            //失敗回呼 Http status 4xx 5xx
+	            error:function(xhr,status,error){
+	                
+	              //取出錯誤資訊
+	                
+	                console.log(xhr.responseJSON);
+	               
+	            }
+	        }
+	    );
+};
+
+btn2.onclick =function() {
+	$.ajax(
+	        {
+	            url:urlString2,
+	            type:'POST', //不給 預設為GET
+	            beforeSend:function(xhr){
+	                //帶Request Header Content-Type
+	                xhr.setRequestHeader('Content-Type','application/json');
+	            },
+	            //傳遞JSON String
+	            data:jsonData1,
+	            //成功回呼 Http status 2xx
+	            success:function(data,status,xhr){
+	               // console.log(data.content);//
+	              document.getElementById("p5").innerHTML=data.content;
+	                
+	            },
+	            //失敗回呼 Http status 4xx 5xx
+	            error:function(xhr,status,error){
+	                
+	              //取出錯誤資訊
+	                
+	                console.log(xhr.responseJSON);
+	               
+	            }
+	        }
+	    );
+};
+btn3.onclick =function() {
+	p1.innerHTML=btn3.innerHTML;
+	socket =new SockJS(ws);
+	stompClient =Stomp.over(socket);
+	stompClient.connect({}, function (frame) {
+		//data.innerHTML="success";
+		//stompClient.send("/app/message1",{},jsondata2);
+		//setTimeout(function() {
+			stompClient.subscribe("/topic/content"+document.getElementById("p5").innerHTML, function (response) {
+			console.log("success Max");
+			//console.log(response);
+		     //
+		     var ma=JSON.parse(response.body);
+		     p1.innerHTML+="<br>"+ma.content+" "+ma.name+"<br>";
+		},{});
+		//},500);
+	},function (){
+		p1.innerHTML="error";
+	});
+};
+
+btn4.onclick =function() {
+	if(stompClient){
+		stompClient.disconnect();
+		p1.innerHTML=btn4.innerHTML;
+	}
+};
+
+btn5.onclick =function() {
+	if(stompClient){
+		//p1.innerHTML=array1[0].name;
+		stompClient.send("/app/topic",{},jsondata2);
+		//p1.innerHTML+=array1[0].name;
+	}
+};
+</script>
+</body>
+</html>
